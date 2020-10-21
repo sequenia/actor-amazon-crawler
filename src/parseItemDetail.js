@@ -27,7 +27,7 @@ function getPossiblePriceSelectors() {
 function findFirstMetElement($, possibleSelectors) {
     for (let index = 0; index < possibleSelectors.length; index++) {
         const selector = possibleSelectors[index];
-        const element = $.find(selector);
+        const element = $(selector);
 
         if (element.length !== 0) {
             return element;
