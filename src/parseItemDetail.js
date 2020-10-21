@@ -1,6 +1,45 @@
 const Apify = require('apify');
+const parsePrice = require('parse-price');
 
 const { log } = Apify.utils;
+
+function extractPriceInfo($) {
+    const possiblePriceSelectors = getPossiblePriceSelectors();
+    const priceElement = findFirstMetElement($, possiblePriceSelectors);
+
+    if (priceElement === undefined) {
+        return undefined;
+    }
+
+    const price = extractTextPrice(priceElement);
+    const priceParsed = parsePrice(price);
+
+    return { price, priceParsed };
+}
+
+function getPossiblePriceSelectors() {
+    return [
+        '#priceblock_ourprice',
+        '#priceblock_saleprice'
+    ];
+}
+
+function findFirstMetElement($, possibleSelectors) {
+    for (let index = 0; index < possibleSelectors.length; index++) {
+        const selector = possibleSelectors[index];
+        const element = $.find(selector);
+
+        if (element.length !== 0) {
+            return element;
+        }
+    }
+
+    return undefined;
+}
+
+function extractTextPrice(priceElement) {
+    return priceElement.text().trim();
+}
 
 async function parseItemDetail($, request, requestQueue, getReviews) {
     const { sellerUrl, asin, detailUrl, reviewsUrl, delivery } = request.userData;
@@ -59,6 +98,11 @@ async function parseItemDetail($, request, requestQueue, getReviews) {
             }
         }
     }
+
+    const priceInfo = extractPriceInfo($);
+    item.price = priceInfo ? priceInfo.price : undefined;
+    item.priceParsed = priceInfo ? priceInfo.priceParsed : undefined;
+
     if (getReviews) {
         await requestQueue.addRequest({
             url: reviewsUrl,
