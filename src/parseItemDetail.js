@@ -38,7 +38,9 @@ function findFirstMetElement($, possibleSelectors) {
 }
 
 function extractTextPrice(priceElement) {
-    return priceElement.text().trim();
+    const prices = priceElement.text().split('-');
+    const firstPrice = prices[0].trim();
+    return firstPrice;
 }
 
 async function parseItemDetail($, request, requestQueue, getReviews) {
