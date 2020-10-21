@@ -12,6 +12,45 @@ function extractInfo($) {
         thumbnailImage: images.length !== 0 ? images.attr('src').replace('_SS160_.', '') : null,
     };
 }
+
+function extractPriceInfo($) {
+    const possiblePriceSelectors = getPossiblePriceSelectors();
+    const priceElement = findFirstMetElement($, possiblePriceSelectors);
+
+    if (priceElement === undefined) {
+        return undefined;
+    }
+
+    const price = extractTextPrice(priceElement);
+    const priceParsed = parsePrice(price);
+
+    return { price, priceParsed };
+}
+
+function getPossiblePriceSelectors() {
+    return [
+        '#priceblock_ourprice',
+        '#priceblock_saleprice'
+    ];
+}
+
+function findFirstMetElement($, possibleSelectors) {
+    for (let index = 0; index < possibleSelectors.length; index++) {
+        const selector = possibleSelectors[index];
+        const element = $.find(selector);
+
+        if (element.length !== 0) {
+            return element;
+        }
+    }
+
+    return undefined;
+}
+
+function extractTextPrice(element) {
+    return element.text().trim().replace('Rs.', 'Rs');
+}
+
 function buildSellerUrl(url) {
     const parsedUrl = queryString.parseUrl(url);
     return `${parsedUrl.url}/?seller=${parsedUrl.query.seller}`;
@@ -30,7 +69,7 @@ function extractSellers($, request) {
         let priceParsed = null;
 
         if (priceElem.length !== 0) {
-            price = priceElem.text().trim().replace('Rs.', 'Rs');
+            price = extractTextPrice(priceElem);
             priceParsed = parsePrice(price);
         } else {
             price = 'price not displayed';
@@ -92,6 +131,7 @@ async function parseSellerDetail($, request) {
     const sellers = await extractSellers($, request);
     const item = await extractInfo($);
     const currency = await getCurrency(request);
+    const priceInfo = await extractPriceInfo($);
 
     if (request.userData.sellers) {
         item.sellers = request.userData.sellers.concat(sellers);
@@ -109,6 +149,12 @@ async function parseSellerDetail($, request) {
     if (item.title === null) {
         item.status = 'This ASIN is not available for this country.';
     }
+
+    if (priceInfo) {
+        item.price = priceInfo.price;
+        item.priceParsed = priceInfo.priceParsed;
+    }
+
     return item;
 }
 
