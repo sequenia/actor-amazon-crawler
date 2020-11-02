@@ -87,7 +87,11 @@ async function parseItemDetail($, request, requestQueue, getReviews) {
         if (scriptText.indexOf("'colorImages':").length !== 0
             && scriptText.indexOf("'colorToAsin'").length !== 0
             && scriptText.indexOf("'initial': ").length !== 0) {
-            const textParse = scriptText.split("'colorImages':")[1].split("'colorToAsin'")[0].trim().replace("'initial': ", '').replace(/(},$|^{)/g, '');
+
+            let textParse = scriptText.split("'colorImages':")[1]
+            textParse = textParse ? textParse.split("'colorToAsin'")[0].trim().replace("'initial': ", '').replace(/(},$|^{)/g, '') : textParse;
+            textParse = textParse ? textParse : "[]";
+
             const parsedImageArray = JSON.parse(textParse);
             for (const image of parsedImageArray) {
                 if (image.hiRes && image.hiRes !== null) {
