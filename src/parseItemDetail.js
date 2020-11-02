@@ -89,7 +89,7 @@ async function parseItemDetail($, request, requestQueue, getReviews) {
             && scriptText.indexOf("'initial': ").length !== 0) {
 
             let textParse = scriptText.split("'colorImages':")[1]
-            textParse = textParse ? textParse : textParse.split("'colorToAsin'")[0].trim().replace("'initial': ", '').replace(/(},$|^{)/g, '');
+            textParse = textParse ? textParse.split("'colorToAsin'")[0].trim().replace("'initial': ", '').replace(/(},$|^{)/g, '') : textParse;
             textParse = textParse ? textParse : "[]";
 
             const parsedImageArray = JSON.parse(textParse);
