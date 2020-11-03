@@ -43,7 +43,7 @@ function extractTextPrice(priceElement) {
     return firstPrice;
 }
 
-function extractTitle() {
+function extractTitle($) {
     const h1 = $('h1');
     return h1.length !== 0 ? h1.text().trim() : null;
 }
@@ -114,7 +114,7 @@ async function parseItemDetail($, request, requestQueue, getReviews) {
     item.price = priceInfo ? priceInfo.price : undefined;
     item.priceParsed = priceInfo ? priceInfo.priceParsed : undefined;
 
-    const title = extractTitle();
+    const title = extractTitle($);
 
     // NOTE: Wrapped to repeat the end result of other parsing
     // because other parsing is commented.
