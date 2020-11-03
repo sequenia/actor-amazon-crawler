@@ -43,6 +43,11 @@ function extractTextPrice(priceElement) {
     return firstPrice;
 }
 
+function extractTitle() {
+    const h1 = $('h1');
+    return h1.length !== 0 ? h1.text().trim() : null;
+}
+
 async function parseItemDetail($, request, requestQueue, getReviews) {
     const { sellerUrl, asin, detailUrl, reviewsUrl, delivery } = request.userData;
     const item = {};
@@ -109,7 +114,26 @@ async function parseItemDetail($, request, requestQueue, getReviews) {
     item.price = priceInfo ? priceInfo.price : undefined;
     item.priceParsed = priceInfo ? priceInfo.priceParsed : undefined;
 
-    if (getReviews) {
+    const title = extractTitle();
+
+    // NOTE: Wrapped to repeat the end result of other parsing
+    // because other parsing is commented.
+    itemInfo = {
+        title,
+        asin,
+        detailUrl,
+        sellerUrl,
+        itemDetail: item
+    };
+
+    if (itemInfo.title === null) {
+        itemInfo.status = 'This ASIN is not available for this country.';
+    }
+
+    return itemInfo;
+
+    // NOTE: Commented because not necessary
+    /*if (getReviews) {
         await requestQueue.addRequest({
             url: reviewsUrl,
             userData: {
@@ -131,7 +155,7 @@ async function parseItemDetail($, request, requestQueue, getReviews) {
                 label: 'seller',
             },
         }, { forefront: true });
-    }
+    }*/
 }
 
 module.exports = parseItemDetail;

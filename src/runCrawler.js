@@ -59,7 +59,11 @@ async function runCrawler(params) {
         // extract info about item and about seller offers
     } else if (label === 'detail') {
         try {
-            await detailParser($, request, requestQueue, getReviews);
+            const item = await detailParser($, request, requestQueue, getReviews);
+
+            // Stop parsing here, don't need to load sellers and reviews.
+            // This parsing is commented in detailParser.
+            await saveItem('RESULT', request, item, input, env.defaultDatasetId, session);
         } catch (e) {
             log.error('Detail parsing failed', e);
         }
