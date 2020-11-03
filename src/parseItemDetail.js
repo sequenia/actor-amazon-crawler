@@ -44,8 +44,8 @@ function extractTextPrice(priceElement) {
 }
 
 function extractTitle($) {
-    const h1 = $('h1');
-    return h1.length !== 0 ? h1.text().trim() : null;
+    const titleElement = $('#productTitle');
+    return titleElement.length !== 0 ? titleElement.text().trim() : null;
 }
 
 async function parseItemDetail($, request, requestQueue, getReviews) {
